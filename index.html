@@ -22,3 +22,135 @@ function findMatches(){const v=document.querySelector('#birthday').value;if(!v){
 function connect(b){b.classList.add('sent');b.textContent='Requested';b.disabled=true;toast('Demo request shown. Real connections need account verification.')}
 let timer;function toast(s){const t=document.querySelector('#toast');t.textContent=s;t.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>t.classList.remove('show'),2400)}
 </script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BirthdayMatch — Find your birthday twins</title>
+<style>
+:root{--bg:#0c0a18;--panel:#171329;--text:#f8f5ff;--muted:#aaa2c2;--pink:#ff6eb4;--purple:#9b7bff;--line:#342b50;--good:#75e0b0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#302052 0,transparent 38%),radial-gradient(ellipse at 90% 20%,#3b1d48 0,transparent 32%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+header{max-width:1100px;margin:auto;padding:22px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px;font-weight:850;font-size:20px}.cake{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--pink),var(--purple));font-size:20px}.nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button{border:0;border-radius:12px;padding:11px 16px;font-weight:750;cursor:pointer;color:white;background:linear-gradient(100deg,#a66bff,#f06db6)}button:disabled{opacity:.55;cursor:not-allowed}.ghost{background:#ffffff0c;border:1px solid var(--line);color:var(--text)}
+main{max-width:1100px;margin:auto;padding:20px 22px 60px}.hero{text-align:center;padding:44px 12px 30px}.eyebrow{color:#ff9bcf;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.hero h1{font-size:clamp(36px,7vw,64px);line-height:1.03;letter-spacing:-2.8px;margin:14px 0}.gradient{background:linear-gradient(90deg,#ff8bc5,#b99aff);-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{max-width:590px;margin:auto;color:var(--muted);font-size:16px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}.card{background:linear-gradient(160deg,#1b1630ee,#141126f2);border:1px solid var(--line);border-radius:22px;padding:23px;box-shadow:0 18px 55px #0003}.card h2{margin:0 0 5px;font-size:21px}.sub{color:var(--muted);margin:0 0 18px;font-size:13px}.label{display:block;font-size:13px;font-weight:700;margin:15px 0 7px}.field{width:100%;padding:13px 14px;border:1px solid #44385f;border-radius:12px;background:#0e0b1b;color:white;font:inherit;outline:none}.field:focus{border-color:var(--purple)}.modes{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mode{padding:12px;border-radius:12px;border:1px solid var(--line);background:#ffffff08;color:var(--muted);text-align:left}.mode strong{display:block;color:var(--text);font-size:13px}.mode.active{border-color:#b18aff;background:#9b7bff1c}.mode small{font-size:11px}.btn{width:100%;margin-top:17px;padding:14px;font-size:15px}.note{color:var(--muted);font-size:11px;margin:12px 0 0}.status{color:var(--good);font-size:12px;min-height:18px;margin-top:10px}.profile{display:flex;align-items:center;gap:13px;padding:13px 0;border-top:1px solid var(--line)}.avatar{width:44px;height:44px;flex:none;border-radius:15px;display:grid;place-items:center;font-size:20px;background:linear-gradient(135deg,#563e83,#bd609e)}.pinfo{min-width:0;flex:1}.pinfo strong{display:block}.pinfo span{color:var(--muted);font-size:12px}.tag{font-size:10px;font-weight:800;color:#ffabd4;background:#ff6eb41b;border:1px solid #ff6eb43d;padding:5px 8px;border-radius:20px}.empty{padding:25px 12px;text-align:center;color:var(--muted)}.empty .emoji{font-size:32px;margin-bottom:7px}.checkrow{display:flex;gap:9px;align-items:flex-start;color:var(--muted);font-size:12px;margin-top:13px}.checkrow input{margin-top:4px}.footer{text-align:center;color:#817997;font-size:11px;margin-top:25px}.hidden{display:none!important}
+@media(max-width:760px){header{padding:16px}main{padding:10px 15px 40px}.hero{padding:36px 4px 25px}.hero h1{letter-spacing:-1.8px}.layout{grid-template-columns:1fr}.card{padding:19px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="cake">🎂</div>Birthday<span class="gradient">Match</span></div>
+ <nav class="nav"><span id="who" class="note">Not signed in</span><button id="logout" class="ghost hidden">Log out</button></nav>
+</header>
+<main>
+ <section class="hero"><div class="eyebrow">One date. A world of connections.</div><h1>Meet your <span class="gradient">birthday twins.</span></h1><p>Discover people around the world who share your special day. Your full date of birth stays private.</p></section>
+ <section class="layout">
+  <div class="card">
+   <h2 id="authTitle">Create your account ✨</h2><p class="sub" id="authSub">Sign up or log in to save your birthday profile.</p>
+   <div id="authFields">
+    <label class="label" for="email">Email</label><input class="field" id="email" type="email" autocomplete="email" placeholder="you@example.com">
+    <label class="label" for="password">Password</label><input class="field" id="password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters">
+    <div id="signupFields">
+     <label class="label" for="username">Username</label><input class="field" id="username" maxlength="30" placeholder="Choose a public nickname">
+     <label class="label" for="birthday">Birthday (private)</label><input class="field" id="birthday" type="date">
+     <label class="label" for="country">Country (optional)</label><input class="field" id="country" maxlength="60" placeholder="e.g. India">
+     <label class="checkrow"><input id="publicProfile" type="checkbox"><span>Allow my nickname and country to appear in birthday matches. My email and full birthday will never be shown.</span></label>
+    </div>
+    <button class="btn" id="authButton">Create account</button>
+    <button class="ghost btn" id="switchMode" type="button">Already have an account? Log in</button>
+   </div>
+   <div id="profilePanel" class="hidden">
+    <p class="sub">Your account is signed in. You can update your birthday profile below.</p>
+    <label class="label" for="editUsername">Username</label><input class="field" id="editUsername" maxlength="30">
+    <label class="label" for="editBirthday">Birthday (private)</label><input class="field" id="editBirthday" type="date">
+    <label class="label" for="editCountry">Country (optional)</label><input class="field" id="editCountry" maxlength="60">
+    <label class="checkrow"><input id="editPublic" type="checkbox"><span>Show my nickname and country in matches.</span></label>
+    <button class="btn" id="saveProfile">Save profile</button>
+   </div>
+   <div class="status" id="authStatus" role="status"></div>
+   <p class="note">For safety, BirthdayMatch does not provide direct messaging or reveal email addresses. Only share a nickname and country if you choose to make your profile visible.</p>
+  </div>
+  <div class="card">
+   <h2>Your birthday twins 🌎</h2><p class="sub">Sign in and save your profile to search for matches.</p>
+   <div class="modes"><button class="mode active" id="monthMode"><strong>🎈 Same day & month</strong><small>Any birth year</small></button><button class="mode" id="exactMode"><strong>🎯 Exact birthday</strong><small>Same day, month & year</small></button></div>
+   <button class="btn" id="findButton">🔍 Find birthday twins</button>
+   <div id="matchStatus" class="status" role="status"></div><div id="results"><div class="empty"><div class="emoji">🌎</div><strong>Your matches will appear here.</strong><br><span>Create an account and save your birthday profile first.</span></div></div>
+  </div>
+ </section>
+ <div class="footer">BirthdayMatch · Early version · Be kind, stay safe, protect your privacy.</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://oxwfjiktfyedxtcnaliy.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qO8PirMItEn1QxMfZAy4MQ_7gZ5wvpo";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+let loginMode = false, matchMode = "month", currentUser = null, currentProfile = null;
+const $ = id => document.getElementById(id);
+function status(id, message, error=false){$(id).textContent=message;$(id).style.color=error?"#ff9caa":"#75e0b0";}
+function localDateParts(value){const [y,m,d]=value.split("-").map(Number);return {year:y,month:m,day:d};}
+function setAuthMode(){ $("authTitle").textContent=loginMode?"Welcome back":"Create your account ✨";$("authSub").textContent=loginMode?"Log in to your BirthdayMatch account.":"Sign up to save your birthday profile."; $("signupFields").classList.toggle("hidden",loginMode);$("authButton").textContent=loginMode?"Log in":"Create account";$("switchMode").textContent=loginMode?"Need an account? Sign up":"Already have an account? Log in";$("password").autocomplete=loginMode?"current-password":"new-password"; }
+$("switchMode").onclick=()=>{loginMode=!loginMode;status("authStatus","");setAuthMode();};
+$("authButton").onclick=async()=>{
+ status("authStatus","Working…");
+ const email=$("email").value.trim(),password=$("password").value;
+ if(!email||password.length<8){status("authStatus","Enter a valid email and a password of at least 8 characters.",true);return;}
+ if(loginMode){
+  const {error}=await db.auth.signInWithPassword({email,password});
+  if(error) status("authStatus",error.message,true); else status("authStatus","Logged in!");
+ } else {
+  const username=$("username").value.trim(),date=$("birthday").value;
+  if(username.length<3||!date){status("authStatus","Enter a username (3–30 characters) and birthday.",true);return;}
+  const dob=localDateParts(date),cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-13);
+  if(new Date(date+"T12:00:00")>cutoff){status("authStatus","BirthdayMatch accounts are for people aged 13 and older.",true);return;}
+  const {data,error}=await db.auth.signUp({email,password});
+  if(error){status("authStatus",error.message,true);return;}
+  if(!data.user){status("authStatus","Account created. Check your email if verification is requested.");return;}
+  if(!data.session){status("authStatus","Account created. Follow the email verification instructions, then log in.");return;}
+  const {error:profileError}=await db.from("profiles").insert({id:data.user.id,username,birthday_day:dob.day,birthday_month:dob.month,birth_year:dob.year,country:$("country").value.trim()||null,is_public:$("publicProfile").checked});
+  if(profileError){status("authStatus","Account created, but profile save failed: "+profileError.message,true);return;}
+  status("authStatus","Account and profile created!");
+ }
+};
+$("logout").onclick=async()=>{await db.auth.signOut();status("authStatus","Signed out.");};
+async function loadProfile(user){
+ currentUser=user;
+ $("who").textContent=user?user.email:"Not signed in";
+ $("logout").classList.toggle("hidden",!user);
+ $("authFields").classList.toggle("hidden",!!user);
+ $("profilePanel").classList.toggle("hidden",!user);
+ if(!user){currentProfile=null;return;}
+ const {data,error}=await db.from("profiles").select("username,birthday_day,birthday_month,birth_year,country,is_public").eq("id",user.id).maybeSingle();
+ if(error){status("authStatus",error.message,true);return;}
+ currentProfile=data;
+ if(data){
+  $("editUsername").value=data.username;$("editBirthday").value=`${data.birth_year}-${String(data.birthday_month).padStart(2,"0")}-${String(data.birthday_day).padStart(2,"0")}`;$("editCountry").value=data.country||"";$("editPublic").checked=data.is_public;
+ } else status("authStatus","Your profile is not saved yet. Please contact support before matching.");
+}
+$("saveProfile").onclick=async()=>{
+ if(!currentUser)return;
+ const date=$("editBirthday").value;if(!date){status("authStatus","Choose your birthday.",true);return;}
+ const dob=localDateParts(date);
+ const {error}=await db.from("profiles").update({username:$("editUsername").value.trim(),birthday_day:dob.day,birthday_month:dob.month,birth_year:dob.year,country:$("editCountry").value.trim()||null,is_public:$("editPublic").checked}).eq("id",currentUser.id);
+ if(error)status("authStatus",error.message,true);else{status("authStatus","Profile updated.");await loadProfile(currentUser);}
+};
+$("monthMode").onclick=()=>{matchMode="month";$("monthMode").classList.add("active");$("exactMode").classList.remove("active");};
+$("exactMode").onclick=()=>{matchMode="exact";$("exactMode").classList.add("active");$("monthMode").classList.remove("active");};
+$("findButton").onclick=async()=>{
+ if(!currentUser||!currentProfile){status("matchStatus","Please sign in and save your profile first.",true);return;}
+ status("matchStatus","Searching…");$("results").innerHTML="";
+ let q=db.from("profiles").select("username,country,birthday_day,birthday_month,birth_year").eq("is_public",true).eq("birthday_day",currentProfile.birthday_day).eq("birthday_month",currentProfile.birthday_month).neq("id",currentUser.id).limit(50);
+ if(matchMode==="exact")q=q.eq("birth_year",currentProfile.birth_year);
+ const {data,error}=await q;
+ if(error){status("matchStatus",error.message,true);return;}
+ status("matchStatus",`${data.length} match${data.length===1?"":"es"} found.`);
+ if(!data.length){$("results").innerHTML='<div class="empty"><div class="emoji">🪐</div><strong>No public matches yet.</strong><br><span>More birthday twins may join later.</span></div>';return;}
+ $("results").innerHTML=data.map(p=>`<div class="profile"><div class="avatar">🎂</div><div class="pinfo"><strong>${escapeHtml(p.username)}</strong><span>${escapeHtml(p.country||"Country not shared")} · ${matchMode==="exact"?"Exact birthday":"Birthday twin"}</span></div><span class="tag">MATCH</span></div>`).join("");
+};
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+db.auth.onAuthStateChange((_event,session)=>{loadProfile(session?.user||null);});
+db.auth.getSession().then(({data})=>loadProfile(data.session?.user||null));
+setAuthMode();
+</script>
+</body>
+</html>
